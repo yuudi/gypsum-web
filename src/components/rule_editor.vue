@@ -2,7 +2,7 @@
   <h3>编辑规则</h3>
   <el-form :model="rule" v-loading="loading" label-width="80px">
     <el-form-item label="名称">
-      <el-input v-model="rule.display_name"></el-input>
+      <el-input v-model="rule.display_name"> </el-input>
     </el-form-item>
     <el-form-item label="状态">
       <el-switch v-model="rule.active" active-text="启用" inactive-text="暂停">
@@ -15,18 +15,21 @@
         :key="i"
         v-model.number="rule.groups_id[i]"
         placeholder="群号"
-      ></el-input>
+      >
+      </el-input>
       <el-button
         size="mini"
         icon="el-icon-circle-plus-outline"
         @click="rule.groups_id.push(null)"
-        >添加
+      >
+        添加
       </el-button>
       <el-button
         size="mini"
         icon="el-icon-remove-outline"
         @click="rule.groups_id.pop()"
-        >删除
+      >
+        删除
       </el-button>
     </el-form-item>
     <el-form-item label="QQ号">
@@ -36,18 +39,21 @@
         :key="i"
         v-model.number="rule.users_id[i]"
         placeholder="QQ号"
-      ></el-input>
+      >
+      </el-input>
       <el-button
         size="mini"
         icon="el-icon-circle-plus-outline"
         @click="rule.users_id.push(null)"
-        >添加
+      >
+        添加
       </el-button>
       <el-button
         size="mini"
         icon="el-icon-remove-outline"
         @click="rule.users_id.pop()"
-        >删除
+      >
+        删除
       </el-button>
     </el-form-item>
     <el-form-item label="消息类型">
@@ -57,7 +63,8 @@
           :key="item.value"
           :label="item.label"
           :value="item.value"
-        ></el-option>
+        >
+        </el-option>
         <!-- 
           TODO: 得想个办法自定义
         -->
@@ -70,7 +77,8 @@
           :key="item.value"
           :label="item.label"
           :value="item.value"
-        ></el-option>
+        >
+        </el-option>
       </el-select>
     </el-form-item>
     <el-form-item label="匹配">
@@ -79,19 +87,22 @@
         :key="i"
         v-model.number="rule.patterns[i]"
         placeholder="匹配表达式"
-      ></el-input>
+      >
+      </el-input>
       <el-button
         size="mini"
         icon="el-icon-circle-plus-outline"
         @click="rule.patterns.push(null)"
-        >添加
+      >
+        添加
       </el-button>
       <el-button
         size="mini"
         icon="el-icon-remove-outline"
         :disabled="rule.patterns.length <= 1"
         @click="rule.patterns.pop()"
-        >删除
+      >
+        删除
       </el-button>
     </el-form-item>
     <el-form-item label="仅被at">
@@ -103,10 +114,11 @@
         :autosize="{ minRows: 4, maxRows: 20 }"
         placeholder="请输入回复内容"
         v-model="rule.response"
-      ></el-input>
+      >
+      </el-input>
     </el-form-item>
     <el-form-item label="优先级">
-      <el-input-number v-model="rule.priority" size="small"></el-input-number>
+      <el-input-number v-model="rule.priority" size="small"> </el-input-number>
     </el-form-item>
     <el-form-item label="阻止后续">
       <el-checkbox v-model="rule.block">
@@ -114,7 +126,7 @@
       </el-checkbox>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="save">保存</el-button>
+      <el-button type="primary" @click="save"> 保存 </el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -207,24 +219,20 @@ export default {
     },
   },
   created() {
-    if (this.rule_id !== 0) {
-      let thisvue = this;
-      axios
-        .get("/api/v1/rules/" + this.rule_id)
-        .then(function (res) {
-          if (res.data.code === undefined) {
-            thisvue.rule = res.data;
-            this.loading = false;
-          } else {
-            thisvue.$alert("失败：" + res.data.message);
-          }
-        })
-        .catch(function (error) {
-          thisvue.$alert("失败：" + error);
-        });
-    } else {
-      this.loading = false;
-    }
+    let thisvue = this;
+    axios
+      .get("/api/v1/rules/" + this.rule_id)
+      .then(function (res) {
+        if (res.data.code === undefined) {
+          thisvue.rule = res.data;
+          thisvue.loading = false;
+        } else {
+          thisvue.$alert("失败：" + res.data.message);
+        }
+      })
+      .catch(function (error) {
+        thisvue.$alert("失败：" + error);
+      });
   },
 };
 </script>

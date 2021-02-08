@@ -1,25 +1,25 @@
 <template>
   <el-container>
     <el-aside width="250px">
-      <el-tree :props="treeProps" :load="load_group_items" lazy>
+      <el-tree
+        :props="treeProps"
+        :load="load_group_items"
+        @node-click="group_item_selected"
+        lazy
+      >
         <template #default="{ node, data }">
           <span class="item-tree-node">
             <span class="item-tree-node-text">
-              <i :class="item_icon[data.item_type]"></i>
+              <i :class="item_icon[data.item_type]"> </i>
               {{ data.display_name }}
             </span>
             <span>
               <el-button
-                v-if="data.item_type === 'group'"
-                type="text"
-                icon="el-icon-circle-plus-outline"
-                @click="console.log(node, data)"
-              ></el-button>
-              <el-button
                 type="text"
                 icon="el-icon-delete"
                 @click="console.log(node, data)"
-              ></el-button>
+              >
+              </el-button>
             </span>
           </span>
         </template>
@@ -27,22 +27,33 @@
     </el-aside>
     <el-main>
       <template v-if="item_select === null">
-        <el-empty description="选择一个项目开始"></el-empty>
+        <el-empty description="选择一个项目开始"> </el-empty>
       </template>
       <template v-else-if="item_select.item_type === 'rule'">
-        <RuleEditor :rule_id="item_select.item_id"></RuleEditor>
+        <RuleEditor :rule_id="item_select.item_id" :key="item_select.item_id">
+        </RuleEditor>
       </template>
       <template v-else-if="item_select.item_type === 'trigger'">
-        <TriggerEditor :trigger_id="item_select.item_id"></TriggerEditor>
+        <TriggerEditor
+          :trigger_id="item_select.item_id"
+          :key="item_select.item_id"
+        >
+        </TriggerEditor>
       </template>
       <template v-else-if="item_select.item_type === 'scheduler'">
-        <JobEditor :job_id="item_select.item_id"></JobEditor>
+        <JobEditor :job_id="item_select.item_id" :key="item_select.item_id">
+        </JobEditor>
       </template>
       <template v-else-if="item_select.item_type === 'resource'">
-        <ResourceEditor :resource_id="item_select.item_id"></ResourceEditor>
+        <ResourceEditor
+          :resource_id="item_select.item_id"
+          :key="item_select.item_id"
+        >
+        </ResourceEditor>
       </template>
       <template v-else-if="item_select.item_type === 'group'">
-        <GroupEditor :group_id="item_select.item_id"></GroupEditor>
+        <GroupEditor :group_id="item_select.item_id" :key="item_select.item_id">
+        </GroupEditor>
       </template>
     </el-main>
   </el-container>
@@ -80,7 +91,6 @@ export default {
         label: "display_name",
         children: "items",
         isLeaf: function (data) {
-          console.debug(data);
           return data.item_type !== "group";
         },
       },
@@ -88,7 +98,6 @@ export default {
   },
   methods: {
     load_group_items(node, resolve) {
-      console.debug(node, resolve);
       if (node.level === 0) {
         return resolve([
           {
@@ -103,9 +112,8 @@ export default {
       axios
         .get("/api/v1/groups/" + group_id)
         .then(function (res) {
-          console.debug(res);
           if (res.data.code === undefined) {
-            return resolve(res.data.items);
+            return resolve(res.data.items ?? []);
           } else {
             thisvue.$alert("失败：" + res.data.message);
           }
@@ -113,6 +121,9 @@ export default {
         .catch(function (error) {
           thisvue.$alert("失败：" + error);
         });
+    },
+    group_item_selected(data) {
+      this.item_select = data;
     },
   },
   created() {
