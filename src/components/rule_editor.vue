@@ -1,8 +1,8 @@
 <template>
-  <h3>编辑规则</h3>
+  <h3>消息规则</h3>
   <el-form :model="rule" v-loading="loading" label-width="80px">
     <el-form-item label="名称">
-      <el-input v-model="rule.display_name"> </el-input>
+      <el-input v-model="rule.display_name" class="short-input"> </el-input>
     </el-form-item>
     <el-form-item label="状态">
       <el-switch v-model="rule.active" active-text="启用" inactive-text="暂停">
@@ -126,7 +126,10 @@
       </el-checkbox>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="save"> 保存 </el-button>
+      <el-button v-if="is_create" type="primary" @click="create">
+        创建
+      </el-button>
+      <el-button v-else type="primary" @click="save"> 保存 </el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -139,6 +142,14 @@ export default {
   name: "RuleEditor",
   props: {
     rule_id: {
+      type: Number,
+      default: 0,
+    },
+    is_create: {
+      type: Boolean,
+      default: false,
+    },
+    create_in_group: {
       type: Number,
       default: 0,
     },
@@ -205,7 +216,22 @@ export default {
     save() {
       let thisvue = this;
       axios
-        .put("/api/v1/rules/" + this.rule_id, this.rule)
+        .put("/rules/" + this.rule_id, this.rule)
+        .then(function (res) {
+          if (res.data.code == 0) {
+            ElMessage.success("成功");
+          } else {
+            thisvue.$alert("失败：" + res.data.message);
+          }
+        })
+        .catch(function (error) {
+          thisvue.$alert("失败：" + error);
+        });
+    },
+    create() {
+      let thisvue = this;
+      axios
+        .post(`/groups/${this.create_in_group}/rules`, this.rule)
         .then(function (res) {
           if (res.data.code == 0) {
             ElMessage.success("成功");
@@ -219,20 +245,24 @@ export default {
     },
   },
   created() {
-    let thisvue = this;
-    axios
-      .get("/api/v1/rules/" + this.rule_id)
-      .then(function (res) {
-        if (res.data.code === undefined) {
-          thisvue.rule = res.data;
-          thisvue.loading = false;
-        } else {
-          thisvue.$alert("失败：" + res.data.message);
-        }
-      })
-      .catch(function (error) {
-        thisvue.$alert("失败：" + error);
-      });
+    if (!this.is_create) {
+      let thisvue = this;
+      axios
+        .get("/rules/" + this.rule_id)
+        .then(function (res) {
+          if (res.data.code === undefined) {
+            thisvue.rule = res.data;
+            thisvue.loading = false;
+          } else {
+            thisvue.$alert("失败：" + res.data.message);
+          }
+        })
+        .catch(function (error) {
+          thisvue.$alert("失败：" + error);
+        });
+    } else {
+      this.loading = false;
+    }
   },
 };
 </script>

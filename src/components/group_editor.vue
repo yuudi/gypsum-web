@@ -16,32 +16,107 @@
   <div v-if="group.plugin_version !== 0">
     <p>
       导入的插件：{{ group.plugin_name }}
-      <span class="plugin_version_id"> {{ group.plugin_version }} </span>
+      <span class="plugin_version_id">
+        version: {{ group.plugin_version }}
+      </span>
     </p>
   </div>
   <br /><br />
   <el-form inline>
     <el-form-item>
-      <el-input v-model="export_info.plugin_name"> </el-input>
+      <el-input v-model="export_info.plugin_name" :disabled="group_id === 0">
+      </el-input>
     </el-form-item>
     <el-form-item>
-      <el-button @click="export_group"> 导出此组 </el-button>
+      <el-button @click="export_group" :disabled="group_id === 0">
+        导出此组
+      </el-button>
     </el-form-item>
   </el-form>
   <br /><br />
   <div>
-    新增项目
-    <el-button type="primary" @click="new_item('rules')"> 消息规则 </el-button>
-    <el-button type="primary" disabled> 事件规则 </el-button>
-    <el-button type="primary" disabled> 定时任务 </el-button>
-    <el-button type="primary" disabled> 静态文件 </el-button>
-    <el-button
-      type="primary"
-      @click="new_item('groups')"
-      :disabled="group_id !== 0"
+    <el-space wrap>
+      新增项目
+      <el-button type="primary" @click="new_item('rule')">
+        消息规则
+      </el-button>
+      <el-button type="primary" @click="new_item('trigger')">
+        事件规则
+      </el-button>
+      <el-button type="primary" @click="new_item('job')"> 定时任务 </el-button>
+      <el-button type="primary" @click="create_resource_dialog_visible = true">
+        静态文件
+      </el-button>
+      <el-dialog title="上传文件" v-model="create_resource_dialog_visible">
+        <el-upload
+          drag
+          multiple
+          ref="upload_resource_dialog"
+          :action="'/groups/' + group_id + '/resources/'"
+          :auto-upload="false"
+          :http-request="upload_resource_upload"
+        >
+          <i class="el-icon-upload"></i>
+          <div>将文件拖到此处，或<span style="color: blue">点击上传</span></div>
+        </el-upload>
+        <template #footer>
+          <el-button @click="create_resource_dialog_visible = false">
+            取消
+          </el-button>
+          <el-button type="primary" @click="upload_resource"> 导入 </el-button>
+        </template>
+      </el-dialog>
+      <el-button-group>
+        <el-button
+          type="primary"
+          @click="create_group_dialog_visible = true"
+          :disabled="group_id !== 0"
+        >
+          创建组
+        </el-button>
+        <el-dialog title="创建组" v-model="create_group_dialog_visible">
+          <el-form>
+            <el-form-item label="名称">
+              <el-input v-model="new_group.display_name"> </el-input>
+            </el-form-item>
+          </el-form>
+          <template #footer>
+            <el-button @click="create_group_dialog_visible = false">
+              取消
+            </el-button>
+            <el-button type="primary" @click="create_group"> 创建 </el-button>
+          </template>
+        </el-dialog>
+        <el-button
+          type="primary"
+          @click="import_group_dialog_visible = true"
+          :disabled="group_id !== 0"
+        >
+          导入组
+        </el-button>
+        <el-dialog title="导入组" v-model="import_group_dialog_visible">
+          <el-upload
+            drag
+            ref="import_group_dialog"
+            accept="application/zip"
+            :action="'/groups/' + group_id + '/groups'"
+            :auto-upload="false"
+            :http-request="import_group_upload"
+          >
+            <i class="el-icon-upload"></i>
+            <div>
+              将文件拖到此处，或<span style="color: blue">点击上传</span>
+            </div>
+          </el-upload>
+          <template #footer>
+            <el-button @click="import_group_dialog_visible = false">
+              取消
+            </el-button>
+            <el-button type="primary" @click="import_group"> 导入 </el-button>
+          </template>
+        </el-dialog>
+      </el-button-group></el-space
     >
-      组
-    </el-button>
   </div>
 </template>
 
@@ -51,6 +126,7 @@ import { ElMessage } from "element-plus";
 
 export default {
   name: "GroupEditor",
+  emits: ["item-add"],
   props: {
     group_id: {
       type: Number,
@@ -60,6 +136,12 @@ export default {
   data() {
     return {
       loading: true,
+      create_resource_dialog_visible: false,
+      create_group_dialog_visible: false,
+      import_group_dialog_visible: false,
+      new_group: {
+        display_name: "新组",
+      },
       export_info: {
         plugin_name: "my new plugin",
       },
@@ -69,13 +151,47 @@ export default {
         plugin_version: 0,
         items: [],
       },
+      defaults: {
+        rule: {
+          display_name: "新规则",
+          active: false,
+          message_type: 0xff,
+          groups_id: [],
+          users_id: [],
+          matcher_type: 0,
+          only_at_me: false,
+          patterns: [],
+          response: "",
+          priority: 50,
+          block: false,
+        },
+        trigger: {
+          display_name: "新规则",
+          active: false,
+          groups_id: [],
+          users_id: [],
+          trigger_type: [""],
+          response: "",
+          priority: 50,
+          block: false,
+        },
+        job: {
+          display_name: "新任务",
+          active: false,
+          groups_id: [],
+          users_id: [],
+          once: false,
+          cron_spec: "0 0 * * *",
+          action: "",
+        },
+      },
     };
   },
   methods: {
     save() {
       let thisvue = this;
       axios
-        .patch("/api/v1/groups/" + this.group_id, {
+        .patch("/groups/" + this.group_id, {
           display_name: this.group.display_name,
         })
         .then(function (res) {
@@ -99,13 +215,80 @@ export default {
           +new Date()
       );
     },
-    new_item(item_type) {
+    upload_resource() {
+      this.$refs.upload_resource_dialog.submit();
+    },
+    upload_resource_upload(data) {
       let thisvue = this;
       axios
-        .post("/api/v1/groups/" + this.group_id + "/" + item_type, {})
+        .post(data.action + encodeURIComponent(data.file.name), data.file)
+        .then(function (res) {
+          if (res.data.code === 0) {
+            ElMessage.success("成功");
+            thisvue.$emit("item-add", "resource", res.data.resource_id);
+          } else {
+            thisvue.$alert("失败：" + res.data.message);
+          }
+        })
+        .catch(function (error) {
+          thisvue.$alert("失败：" + error);
+        })
+        .finally(function () {});
+    },
+    create_group() {
+      let thisvue = this;
+      axios
+        .post(`/groups/${this.group_id}/groups`, this.new_group)
         .then(function (res) {
           if (res.data.code == 0) {
             ElMessage.success("成功");
+            thisvue.$emit("item-add", "group", res.data.group_id);
+          } else {
+            thisvue.$alert("失败：" + res.data.message);
+          }
+        })
+        .catch(function (error) {
+          thisvue.$alert("失败：" + error);
+        })
+        .finally(function () {
+          this.create_group_dialog_visible = false;
+        });
+    },
+    import_group() {
+      this.$refs.import_group_dialog.submit();
+    },
+    import_group_upload(data) {
+      if (!data.file.name.endsWith(".zip")) {
+        alert("只能导入zip文件");
+        return;
+      }
+      let thisvue = this;
+      axios
+        .post(data.action, data.file, {
+          headers: {
+            "Content-Type": "application/zip",
+          },
+        })
+        .then(function (res) {
+          if (res.data.code === 0) {
+            ElMessage.success("成功");
+            thisvue.$emit("item-add", "group", res.data.group_id);
+          } else {
+            thisvue.$alert("失败：" + res.data.message);
+          }
+        })
+        .catch(function (error) {
+          thisvue.$alert("失败：" + error);
+        });
+    },
+    new_item(item_type) {
+      let thisvue = this;
+      axios
+        .post(`/groups/${this.group_id}/${item_type}s`, this.defaults[item_type])
+        .then(function (res) {
+          if (res.data.code == 0) {
+            ElMessage.success("成功");
+            thisvue.$emit("item-add", item_type, res.data[item_type + "_id"]);
           } else {
             thisvue.$alert("失败：" + res.data.message);
           }
@@ -118,7 +301,7 @@ export default {
   created() {
     let thisvue = this;
     axios
-      .get("/api/v1/groups/" + this.group_id)
+      .get("/groups/" + this.group_id)
       .then(function (res) {
         if (res.data.code === undefined) {
           thisvue.group = res.data;
@@ -137,6 +320,6 @@ export default {
 <style scoped>
 .plugin_version_id {
   font-style: italic;
-  color: #606060;
+  color: #c0c0c0;
 }
 </style>
