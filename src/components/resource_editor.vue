@@ -31,6 +31,7 @@
     </template>
     <template v-else> 无预览 </template>
   </div>
+  <div><el-button type="primary" @click="download"> 下载 </el-button></div>
 </template>
 
 <script>
@@ -74,6 +75,9 @@ export default {
         .catch(function (error) {
           thisvue.$alert("失败：" + error);
         });
+    },
+    download() {
+      window.open("/api/v1/resources/" + this.resource_id + "/content");
     },
   },
   created() {

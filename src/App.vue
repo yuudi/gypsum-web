@@ -7,7 +7,6 @@
       <el-tree
         :props="tree_props"
         :load="load_group_items"
-        @node-click="group_item_selected"
         draggable
         :allow-drop="allow_drop"
         :allow-drag="allow_drag"
@@ -17,12 +16,22 @@
         ref="group_tree"
       >
         <template #default="{ node, data }">
-          <span class="item-tree-node">
-            <span class="item-tree-node-text">
+          <span class="item-tree-node" style="cursor: auto">
+            <span
+              class="item-tree-node-text"
+              @click="group_item_selected(data)"
+              style="cursor: pointer"
+            >
               <i :class="item_icon[data.item_type]"> </i>
               {{ data.display_name }}
             </span>
             <span>
+              <i
+                v-if="data.item_type !== 'group'"
+                class="el-icon-d-caret"
+                style="cursor: grab"
+              >
+              </i>
               <el-button
                 type="text"
                 icon="el-icon-delete"
@@ -172,7 +181,7 @@ export default {
     delete_item(node, data) {
       this.$refs.group_tree.remove(node);
       let body = null;
-      if (data.item_id === "group") {
+      if (data.item_type === "group") {
         body = { move_to: 0 };
       }
       let thisvue = this;
