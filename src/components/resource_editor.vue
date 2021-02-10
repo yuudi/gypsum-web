@@ -1,7 +1,7 @@
 <template>
   <h3>资源</h3>
   <div>
-    <el-form inline>
+    <el-form inline v-loading="loading">
       <el-form-item>
         <el-input v-model="resource.file_name">
           <template #append>{{ resource.ext }}</template>
@@ -30,6 +30,19 @@
       </audio>
     </template>
     <template v-else> 无预览 </template>
+  </div>
+  <div>
+    <span class="copy_bar_lable">资源引用：</span>
+    <el-input
+      :value="'res(\'' + resource.sha256_sum + resource.ext + '\')'"
+      ref="pongo_ref"
+      readonly
+      style="width: 400px"
+    >
+    </el-input>
+    <el-button icon="el-icon-copy-document" @click="copy_ref('pongo_ref')">
+      复制
+    </el-button>
   </div>
   <div><el-button type="primary" @click="download"> 下载 </el-button></div>
 </template>
@@ -76,6 +89,11 @@ export default {
           thisvue.$alert("失败：" + error);
         });
     },
+    copy_ref(ref) {
+      this.$refs[ref].select();
+      document.execCommand("copy");
+      ElMessage.success("已复制");
+    },
     download() {
       window.open("/api/v1/resources/" + this.resource_id + "/content");
     },
@@ -98,3 +116,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.copy_bar_lable {
+  width: 90px;
+  display: inline-block;
+}
+</style>

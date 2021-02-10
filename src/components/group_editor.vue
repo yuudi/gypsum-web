@@ -1,7 +1,7 @@
 <template>
   <h3>编辑组</h3>
   <div>
-    <el-form inline>
+    <el-form inline v-loading="loading">
       <el-form-item>
         <el-input v-model="group.display_name" :disabled="group_id === 0">
         </el-input>
@@ -37,9 +37,7 @@
   <div>
     <el-space wrap>
       新增项目
-      <el-button type="primary" @click="new_item('rule')">
-        消息规则
-      </el-button>
+      <el-button type="primary" @click="new_item('rule')"> 消息规则 </el-button>
       <el-button type="primary" @click="new_item('trigger')">
         事件规则
       </el-button>
@@ -284,7 +282,10 @@ export default {
     new_item(item_type) {
       let thisvue = this;
       axios
-        .post(`/groups/${this.group_id}/${item_type}s`, this.defaults[item_type])
+        .post(
+          `/groups/${this.group_id}/${item_type}s`,
+          this.defaults[item_type]
+        )
         .then(function (res) {
           if (res.data.code == 0) {
             ElMessage.success("成功");
