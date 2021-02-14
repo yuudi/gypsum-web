@@ -53,6 +53,7 @@
           :action="'/groups/' + group_id + '/resources/'"
           :auto-upload="false"
           :http-request="upload_resource_upload"
+          style="text-align: center"
         >
           <i class="el-icon-upload"></i>
           <div>将文件拖到此处，或<span style="color: blue">点击上传</span></div>
@@ -100,6 +101,7 @@
             :action="'/groups/' + group_id + '/groups'"
             :auto-upload="false"
             :http-request="import_group_upload"
+            style="text-align: center"
           >
             <i class="el-icon-upload"></i>
             <div>

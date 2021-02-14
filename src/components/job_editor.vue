@@ -75,6 +75,7 @@
         <el-time-picker
           v-model="cron_time_simple"
           @change="apply_time_pick_value"
+          :clearable="false"
           placeholder="选择时间"
         >
         </el-time-picker>

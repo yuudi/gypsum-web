@@ -71,7 +71,11 @@
       </el-select>
     </el-form-item>
     <el-form-item label="匹配方式">
-      <el-select v-model.number="rule.matcher_type" placeholder="请选择">
+      <el-select
+        v-model.number="rule.matcher_type"
+        placeholder="请选择"
+        @change="handle_matcher_type_changed"
+      >
         <el-option
           v-for="item in matcher_type_options"
           :key="item.value"
@@ -93,6 +97,7 @@
         size="mini"
         icon="el-icon-circle-plus-outline"
         @click="rule.patterns.push(null)"
+        :disabled="rule.matcher_type === 5 && rule.patterns.length >= 1"
       >
         添加
       </el-button>
@@ -242,6 +247,12 @@ export default {
         .catch(function (error) {
           thisvue.$alert("失败：" + error);
         });
+    },
+    handle_matcher_type_changed() {
+      if (this.rule.matcher_type === 5 && this.rule.patterns.length > 1) {
+        this.rule.patterns = [this.rule.patterns[0]];
+        ElMessage("正则方式只能有一个匹配");
+      }
     },
   },
   created() {
