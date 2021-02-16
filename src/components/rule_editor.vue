@@ -121,6 +121,14 @@
         v-model="rule.response"
       >
       </el-input>
+      <el-button
+        v-for="data in template_help_infos"
+        :key="data.name"
+        type="text"
+        icon="el-icon-question"
+        @click="open_in_new_window(data.link)"
+        >{{ data.name }}</el-button
+      >
     </el-form-item>
     <el-form-item label="优先级">
       <el-input-number v-model="rule.priority" size="small"> </el-input-number>
@@ -202,6 +210,24 @@ export default {
           label: "正则匹配",
         },
       ],
+      template_help_infos: [
+        {
+          name: "简介",
+          link: "https://github.com/yuudi/gypsum/blob/v0.7.1/docs/template.md",
+        },
+        {
+          name: "函数",
+          link: "https://github.com/yuudi/gypsum/blob/v0.7.1/docs/functions.md",
+        },
+        {
+          name: "变量",
+          link: "https://github.com/yuudi/gypsum/blob/v0.7.1/docs/variables.md",
+        },
+        {
+          name: "lua",
+          link: "https://github.com/yuudi/gypsum/blob/v0.7.1/docs/lua.md",
+        },
+      ],
       rule: {
         display_name: "新规则",
         active: true,
@@ -253,6 +279,9 @@ export default {
         this.rule.patterns = [this.rule.patterns[0]];
         ElMessage("正则方式只能有一个匹配");
       }
+    },
+    open_in_new_window(url) {
+      window.open(url);
     },
   },
   created() {

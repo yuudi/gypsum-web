@@ -160,7 +160,7 @@ export default {
           users_id: [],
           matcher_type: 0,
           only_at_me: false,
-          patterns: [],
+          patterns: [""],
           response: "",
           priority: 50,
           block: false,

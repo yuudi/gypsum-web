@@ -180,16 +180,16 @@ export default {
     },
     delete_item(node, data) {
       this.$refs.group_tree.remove(node);
-      let body = null;
+      let config = {};
       if (data.item_type === "group") {
-        body = { move_to: 0 };
+        config.data = { move_to: 0 };
       }
       let thisvue = this;
       axios
-        .delete(`/${data.item_type}s/${data.item_id}`, body)
+        .delete(`/${data.item_type}s/${data.item_id}`, config)
         .then(function (res) {
           if (res.data.code == 0) {
-            ElMessage.success("成功");
+            ElMessage.success("已删除");
           } else {
             thisvue.$alert("失败：" + res.data.message);
           }
