@@ -1,86 +1,69 @@
-<template>
-  <el-container style="height: 98vh">
-    <el-aside width="250px">
-      <el-button type="text" icon="el-icon-refresh" @click="refresh_key++"
-        >刷新
-      </el-button>
-      <el-tree
-        :props="tree_props"
-        :load="load_group_items"
-        draggable
-        :allow-drop="allow_drop"
-        :allow-drag="allow_drag"
-        @node-drop="handle_drop"
-        lazy
-        :key="refresh_key"
-        ref="group_tree"
-      >
-        <template #default="{ node, data }">
-          <span class="item-tree-node" style="cursor: auto">
-            <span
-              class="item-tree-node-text"
-              @click="group_item_selected(data)"
-              style="cursor: pointer"
-            >
-              <i :class="item_icon[data.item_type]"> </i>
-              {{ data.display_name }}
-            </span>
-            <span>
-              <i
-                v-if="data.item_type !== 'group'"
-                class="el-icon-d-caret"
-                style="cursor: grab"
-              >
-              </i>
-              <el-button
-                type="text"
-                icon="el-icon-delete"
-                @click="delete_item(node, data)"
-              >
-              </el-button>
-            </span>
-          </span>
-        </template>
-      </el-tree>
-    </el-aside>
-    <el-container>
-      <el-main>
-        <template v-if="item_select === null">
-          <el-empty description="选择一个项目开始"> </el-empty>
-        </template>
-        <template v-else-if="item_select.item_type === 'rule'">
-          <RuleEditor :rule_id="item_select.item_id" :key="item_select.item_id">
-          </RuleEditor>
-        </template>
-        <template v-else-if="item_select.item_type === 'trigger'">
-          <TriggerEditor
-            :trigger_id="item_select.item_id"
-            :key="item_select.item_id"
-          >
-          </TriggerEditor>
-        </template>
-        <template v-else-if="item_select.item_type === 'scheduler'">
-          <JobEditor :job_id="item_select.item_id" :key="item_select.item_id">
-          </JobEditor>
-        </template>
-        <template v-else-if="item_select.item_type === 'resource'">
-          <ResourceEditor
-            :resource_id="item_select.item_id"
-            :key="item_select.item_id"
-          >
-          </ResourceEditor>
-        </template>
-        <template v-else-if="item_select.item_type === 'group'">
-          <GroupEditor
-            :group_id="item_select.item_id"
-            @item-add="group_item_add"
-            :key="item_select.item_id"
-          >
-          </GroupEditor>
-        </template>
-      </el-main>
-    </el-container>
-  </el-container>
+<template lang="pug">
+el-container(style="height: 98vh")
+  el-aside(width="250px")
+    p gypsum v{{ gypsum.version }}
+    el-button(type="text", icon="el-icon-refresh", @click="refresh_key++") 刷新
+    el-button(
+      type="text",
+      icon="el-icon-setting",
+      @click="admin_setting_dialog_visible = true"
+    ) 设置
+    el-dialog(v-model="admin_setting_dialog_visible")
+      Administrator
+      template(#footer)
+        el-button(@click="admin_setting_dialog_visible = false") 关闭
+    el-tree(
+      :props="tree_props",
+      :load="load_group_items",
+      draggable,
+      :allow-drop="allow_drop",
+      :allow-drag="allow_drag",
+      @node-drop="handle_drop",
+      lazy,
+      :key="refresh_key",
+      ref="group_tree"
+    )
+      template(#default="{ node, data }")
+        span.item-tree-node(style="cursor: auto")
+          span.item-tree-node-text(
+            @click="group_item_selected(data)",
+            style="cursor: pointer"
+          )
+            i(:class="item_icon[data.item_type]") {{ data.display_name }}
+          span
+            i.el-icon-d-caret(
+              v-if="data.item_type !== 'group'",
+              style="cursor: grab"
+            )
+            el-button(
+              type="text",
+              icon="el-icon-delete",
+              @click="delete_item(node, data)"
+            )
+  el-container
+    el-main
+      template(v-if="item_select === null")
+        el-empty(description="选择一个项目开始") 
+      template(v-else-if="item_select.item_type === 'rule'")
+        RuleEditor(:rule_id="item_select.item_id", :key="item_select.item_id")
+      template(v-else-if="item_select.item_type === 'trigger'")
+        TriggerEditor(
+          :trigger_id="item_select.item_id",
+          :key="item_select.item_id"
+        )
+      template(v-else-if="item_select.item_type === 'scheduler'")
+        JobEditor(:job_id="item_select.item_id", :key="item_select.item_id")
+      template(v-else-if="item_select.item_type === 'resource'")
+        ResourceEditor(
+          :resource_id="item_select.item_id",
+          :key="item_select.item_id"
+        )
+      template(v-else-if="item_select.item_type === 'group'")
+        GroupEditor(
+          :group_id="item_select.item_id",
+          @item-add="group_item_add",
+          :key="item_select.item_id"
+        )
 </template>
 
 <script>
@@ -92,6 +75,7 @@ import JobEditor from "./components/job_editor.vue";
 import ResourceEditor from "./components/resource_editor.vue";
 import RuleEditor from "./components/rule_editor.vue";
 import TriggerEditor from "./components/trigger_editor.vue";
+import Administrator from "./components/administrator.vue";
 
 axios.defaults.baseURL = "/api/v1";
 
@@ -103,11 +87,16 @@ export default {
     TriggerEditor,
     JobEditor,
     ResourceEditor,
+    Administrator,
   },
   data() {
     return {
+      gypsum: {
+        version: "unknown",
+        commit: "unknown",
+      },
+      admin_setting_dialog_visible: false,
       refresh_key: 0,
-      tree_node_id: 1000,
       item_icon: {
         group: "el-icon-folder-opened",
         rule: "el-icon-chat-line-round",
@@ -209,6 +198,22 @@ export default {
         tree.getCurrentNode()
       );
     },
+  },
+  created() {
+    let thisvue = this;
+    axios
+      .get("/gypsum/version")
+      .then(function (res) {
+        if (res.data.code === undefined) {
+          thisvue.gypsum.version = res.data.version;
+          thisvue.gypsum.commit = res.data.commit;
+        } else {
+          thisvue.$alert("失败：" + res.data.message);
+        }
+      })
+      .catch(function (error) {
+        thisvue.$alert("失败：" + error);
+      });
   },
 };
 </script>

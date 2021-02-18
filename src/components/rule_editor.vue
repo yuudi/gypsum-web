@@ -1,158 +1,134 @@
-<template>
-  <h3>消息规则</h3>
-  <el-form :model="rule" v-loading="loading" label-width="80px">
-    <el-form-item label="名称">
-      <el-input v-model="rule.display_name" class="short-input"> </el-input>
-    </el-form-item>
-    <el-form-item label="状态">
-      <el-switch v-model="rule.active" active-text="启用" inactive-text="暂停">
-      </el-switch>
-    </el-form-item>
-    <el-form-item label="群号">
-      <div v-if="!rule.groups_id.length">（所有群）</div>
-      <el-input
-        v-for="(_, i) in rule.groups_id"
-        :key="i"
-        v-model.number="rule.groups_id[i]"
-        placeholder="群号"
-      >
-      </el-input>
-      <el-button
-        size="mini"
-        icon="el-icon-circle-plus-outline"
-        @click="rule.groups_id.push(null)"
-      >
-        添加
-      </el-button>
-      <el-button
-        size="mini"
-        icon="el-icon-remove-outline"
-        @click="rule.groups_id.pop()"
-      >
-        删除
-      </el-button>
-    </el-form-item>
-    <el-form-item label="QQ号">
-      <div v-if="!rule.users_id.length">（所有人）</div>
-      <el-input
-        v-for="(_, i) in rule.users_id"
-        :key="i"
-        v-model.number="rule.users_id[i]"
-        placeholder="QQ号"
-      >
-      </el-input>
-      <el-button
-        size="mini"
-        icon="el-icon-circle-plus-outline"
-        @click="rule.users_id.push(null)"
-      >
-        添加
-      </el-button>
-      <el-button
-        size="mini"
-        icon="el-icon-remove-outline"
-        @click="rule.users_id.pop()"
-      >
-        删除
-      </el-button>
-    </el-form-item>
-    <el-form-item label="消息类型">
-      <el-select v-model.number="rule.message_type" placeholder="请选择">
-        <el-option
-          v-for="item in message_type_options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        >
-        </el-option>
-        <!-- 
-          TODO: 得想个办法自定义
-        -->
-      </el-select>
-    </el-form-item>
-    <el-form-item label="匹配方式">
-      <el-select
-        v-model.number="rule.matcher_type"
-        placeholder="请选择"
-        @change="handle_matcher_type_changed"
-      >
-        <el-option
-          v-for="item in matcher_type_options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        >
-        </el-option>
-      </el-select>
-    </el-form-item>
-    <el-form-item label="匹配">
-      <el-input
-        v-for="(_, i) in rule.patterns"
-        :key="i"
-        v-model.number="rule.patterns[i]"
-        placeholder="匹配表达式"
-      >
-      </el-input>
-      <el-button
-        size="mini"
-        icon="el-icon-circle-plus-outline"
-        @click="rule.patterns.push(null)"
-        :disabled="rule.matcher_type === 5 && rule.patterns.length >= 1"
-      >
-        添加
-      </el-button>
-      <el-button
-        size="mini"
-        icon="el-icon-remove-outline"
-        :disabled="rule.patterns.length <= 1"
-        @click="rule.patterns.pop()"
-      >
-        删除
-      </el-button>
-    </el-form-item>
-    <el-form-item label="仅被at">
-      <el-checkbox v-model="rule.only_at_me">仅当被at时触发</el-checkbox>
-    </el-form-item>
-    <el-form-item label="回复">
-      <el-input
-        type="textarea"
-        :autosize="{ minRows: 4, maxRows: 20 }"
-        placeholder="请输入回复内容"
-        v-model="rule.response"
-      >
-      </el-input>
-      <el-button
-        v-for="data in template_help_infos"
-        :key="data.name"
-        type="text"
-        icon="el-icon-question"
-        @click="open_in_new_window(data.link)"
-        >{{ data.name }}</el-button
-      >
-    </el-form-item>
-    <el-form-item label="优先级">
-      <el-input-number v-model="rule.priority" size="small"> </el-input-number>
-    </el-form-item>
-    <el-form-item label="阻止后续">
-      <el-checkbox v-model="rule.block">
-        匹配成功后，不再匹配后续规则
-      </el-checkbox>
-    </el-form-item>
-    <el-form-item>
-      <el-button v-if="is_create" type="primary" @click="create">
-        创建
-      </el-button>
-      <el-button v-else type="primary" @click="save"> 保存 </el-button>
-    </el-form-item>
-  </el-form>
+<template lang="pug">
+h3 消息规则
+el-form(:model="rule", v-loading="loading", label-width="80px")
+  el-form-item(label="名称")
+    el-input.short-input(v-model="rule.display_name") 
+  el-form-item(label="状态")
+    el-switch(v-model="rule.active", active-text="启用", inactive-text="暂停")
+  el-form-item(label="群号")
+    div(v-if="!rule.groups_id.length") （所有群）
+    el-input(
+      v-for="(_, i) in rule.groups_id",
+      :key="i",
+      v-model.number="rule.groups_id[i]",
+      placeholder="群号"
+    )
+    el-button(
+      size="mini",
+      icon="el-icon-circle-plus-outline",
+      @click="rule.groups_id.push(null)"
+    ) 添加
+    el-button(
+      size="mini",
+      icon="el-icon-remove-outline",
+      @click="rule.groups_id.pop()"
+    ) 删除
+  el-form-item(label="QQ号")
+    div(v-if="!rule.users_id.length") （所有人）
+    el-input(
+      v-for="(_, i) in rule.users_id",
+      :key="i",
+      v-model.number="rule.users_id[i]",
+      placeholder="QQ号"
+    )
+    el-button(
+      size="mini",
+      icon="el-icon-circle-plus-outline",
+      @click="rule.users_id.push(null)"
+    ) 添加
+    el-button(
+      size="mini",
+      icon="el-icon-remove-outline",
+      @click="rule.users_id.pop()"
+    ) 删除
+  el-form-item(label="消息类型")
+    el-select(v-model.number="rule.message_type", placeholder="请选择")
+      el-option(
+        v-for="item in message_type_options",
+        :key="item.value",
+        :label="item.label",
+        :value="item.value"
+      )
+      //- TODO: 得想个办法自定义
+  el-form-item(label="匹配方式")
+    el-select(
+      v-model.number="rule.matcher_type",
+      placeholder="请选择",
+      @change="handle_matcher_type_changed"
+    )
+      el-option(
+        v-for="item in matcher_type_options",
+        :key="item.value",
+        :label="item.label",
+        :value="item.value"
+      )
+  el-form-item(label="匹配")
+    el-input(
+      v-for="(_, i) in rule.patterns",
+      :key="i",
+      v-model.number="rule.patterns[i]",
+      placeholder="匹配表达式"
+    )
+    el-button(
+      size="mini",
+      icon="el-icon-circle-plus-outline",
+      @click="rule.patterns.push(null)",
+      :disabled="rule.matcher_type === 5 && rule.patterns.length >= 1"
+    ) 添加
+    el-button(
+      size="mini",
+      icon="el-icon-remove-outline",
+      :disabled="rule.patterns.length <= 1",
+      @click="rule.patterns.pop()"
+    ) 删除
+  el-form-item(label="仅被at")
+    el-checkbox(v-model="rule.only_at_me") 仅当被at时触发
+  el-form-item(label="回复")
+    el-input(
+      type="textarea",
+      :autosize="{ minRows: 4, maxRows: 20 }",
+      placeholder="请输入回复内容",
+      v-model="rule.response"
+    )
+    el-button(
+      v-for="data in template_help_infos",
+      :key="data.name",
+      type="text",
+      icon="el-icon-question",
+      @click="open_in_new_window(data.link)"
+    ) {{ data.name }}
+    el-button(
+      type="text",
+      icon="el-icon-ship",
+      @click="debugger_dialog_visible = true"
+    ) 测试
+    el-dialog(title="模板测试", v-model="debugger_dialog_visible")
+      TemplateTester(
+        debug_type="message",
+        :matcher_type="rule.matcher_type",
+        :pattern="rule.patterns[0]",
+        :response="rule.response"
+      )
+      template(#footer)
+        el-button(@click="debugger_dialog_visible = false") 关闭
+  el-form-item(label="优先级")
+    el-input-number(v-model="rule.priority", size="small") 
+  el-form-item(label="阻止后续")
+    el-checkbox(v-model="rule.block") 匹配成功后，不再匹配后续规则
+  el-form-item
+    el-button(v-if="is_create", type="primary", @click="create") 创建
+    el-button(v-else, type="primary", @click="save") 保存
 </template>
 
 <script>
 import axios from "axios";
 import { ElMessage } from "element-plus";
 
+import TemplateTester from "./template_tester.vue";
+
 export default {
   name: "RuleEditor",
+  components: { TemplateTester },
   props: {
     rule_id: {
       type: Number,
@@ -170,6 +146,7 @@ export default {
   data() {
     return {
       loading: true,
+      debugger_dialog_visible: false,
       message_type_options: [
         {
           value: 0xff,

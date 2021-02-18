@@ -1,50 +1,36 @@
-<template>
-  <h3>资源</h3>
-  <div>
-    <el-form inline v-loading="loading">
-      <el-form-item>
-        <el-input v-model="resource.file_name">
-          <template #append>{{ resource.ext }}</template>
-        </el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="save"> 保存 </el-button>
-      </el-form-item>
-    </el-form>
-  </div>
-  <div>
-    <template v-if="image_ext.includes(resource.ext)">
-      <el-image
-        :src="'/api/v1/resources/' + resource_id + '/content'"
-        fit="contain"
-      >
-      </el-image>
-    </template>
-    <template v-else-if="audio_ext.includes(resource.ext)">
-      <audio
-        :src="'/api/v1/resources/' + resource_id + '/content'"
-        controls
-        preload="none"
-      >
-        浏览器无法在线播放此音频
-      </audio>
-    </template>
-    <template v-else> 无预览 </template>
-  </div>
-  <div>
-    <span class="copy_bar_lable">资源引用：</span>
-    <el-input
-      :value="'res(\'' + resource.sha256_sum + resource.ext + '\')'"
-      ref="pongo_ref"
-      readonly
-      style="width: 400px"
-    >
-    </el-input>
-    <el-button icon="el-icon-copy-document" @click="copy_ref('pongo_ref')">
-      复制
-    </el-button>
-  </div>
-  <div><el-button type="primary" @click="download"> 下载 </el-button></div>
+<template lang="pug">
+h3 资源
+div
+  el-form(inline, v-loading="loading")
+    el-form-item
+      el-input(v-model="resource.file_name")
+        template(#append) {{ resource.ext }}
+    el-form-item
+      el-button(type="primary", @click="save") 保存
+div
+  template(v-if="image_ext.includes(resource.ext)")
+    el-image(
+      :src="'/api/v1/resources/' + resource_id + '/content'",
+      fit="contain"
+    )
+  template(v-else-if="audio_ext.includes(resource.ext)")
+    audio(
+      :src="'/api/v1/resources/' + resource_id + '/content'",
+      controls,
+      preload="none"
+    ) 浏览器无法在线播放此音频
+  template(v-else) 无预览
+div
+  span.copy_bar_lable 资源引用：
+  el-input(
+    :value="resource_ref",
+    ref="pongo_ref",
+    readonly,
+    style="width: 400px"
+  )
+  el-button(icon="el-icon-copy-document", @click="copy_ref('pongo_ref')") 复制
+div
+  el-button(type="primary", @click="download") 下载
 </template>
 
 <script>
@@ -70,6 +56,11 @@ export default {
         sha256_sum: "",
       },
     };
+  },
+  computed: {
+    resource_ref() {
+      return 'res("' + this.resource.sha256_sum + this.resource.ext + '")';
+    },
   },
   methods: {
     save() {

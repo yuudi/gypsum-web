@@ -1,98 +1,66 @@
-<template>
-  <h3>事件规则</h3>
-  <el-form v-loading="loading" label-width="80px">
-    <el-form-item label="名称">
-      <el-input v-model="trigger.display_name" class="short-input"> </el-input>
-    </el-form-item>
-    <el-form-item label="状态">
-      <el-switch
-        v-model="trigger.active"
-        active-text="启用"
-        inactive-text="暂停"
-      >
-      </el-switch>
-    </el-form-item>
-    <el-form-item label="群号">
-      <div v-if="!trigger.groups_id.length">（所有群）</div>
-      <el-input
-        v-for="(_, i) in trigger.groups_id"
-        :key="i"
-        v-model.number="trigger.groups_id[i]"
-        placeholder="群号"
-      >
-      </el-input>
-      <el-button
-        size="mini"
-        icon="el-icon-circle-plus-outline"
-        @click="trigger.groups_id.push(null)"
-      >
-        添加
-      </el-button>
-      <el-button
-        size="mini"
-        icon="el-icon-remove-outline"
-        @click="trigger.groups_id.pop()"
-      >
-        删除
-      </el-button>
-    </el-form-item>
-    <el-form-item label="QQ号">
-      <div v-if="!trigger.users_id.length">（所有人）</div>
-      <el-input
-        v-for="(_, i) in trigger.users_id"
-        :key="i"
-        v-model.number="trigger.users_id[i]"
-        placeholder="QQ号"
-      >
-      </el-input>
-      <el-button
-        size="mini"
-        icon="el-icon-circle-plus-outline"
-        @click="trigger.users_id.push(null)"
-      >
-        添加
-      </el-button>
-      <el-button
-        size="mini"
-        icon="el-icon-remove-outline"
-        @click="trigger.users_id.pop()"
-      >
-        删除
-      </el-button>
-    </el-form-item>
-    <el-form-item label="事件类型">
-      <el-cascader
-        :v-model="trigger.trigger_type"
-        :options="event_type_options"
-        :props="{ checkStrictly: true }"
-      >
-      </el-cascader>
-    </el-form-item>
-    <el-form-item label="回复">
-      <el-input
-        type="textarea"
-        :autosize="{ minRows: 4, maxRows: 20 }"
-        placeholder="请输入回复内容"
-        v-model="trigger.response"
-      >
-      </el-input>
-    </el-form-item>
-    <el-form-item label="优先级">
-      <el-input-number v-model="trigger.priority" size="small">
-      </el-input-number>
-    </el-form-item>
-    <el-form-item label="阻止后续">
-      <el-checkbox v-model="trigger.block">
-        匹配成功后，不再匹配后续规则
-      </el-checkbox>
-    </el-form-item>
-    <el-form-item>
-      <el-button v-if="is_create" type="primary" @click="create">
-        创建
-      </el-button>
-      <el-button v-else type="primary" @click="save"> 保存 </el-button>
-    </el-form-item>
-  </el-form>
+<template lang="pug">
+h3 事件规则
+el-form(v-loading="loading", label-width="80px")
+  el-form-item(label="名称")
+    el-input.short-input(v-model="trigger.display_name") 
+  el-form-item(label="状态")
+    el-switch(v-model="trigger.active", active-text="启用", inactive-text="暂停")
+  el-form-item(label="群号")
+    div(v-if="!trigger.groups_id.length") （所有群）
+    el-input(
+      v-for="(_, i) in trigger.groups_id",
+      :key="i",
+      v-model.number="trigger.groups_id[i]",
+      placeholder="群号"
+    )
+    el-button(
+      size="mini",
+      icon="el-icon-circle-plus-outline",
+      @click="trigger.groups_id.push(null)"
+    ) 添加
+    el-button(
+      size="mini",
+      icon="el-icon-remove-outline",
+      @click="trigger.groups_id.pop()"
+    ) 删除
+  el-form-item(label="QQ号")
+    div(v-if="!trigger.users_id.length") （所有人）
+    el-input(
+      v-for="(_, i) in trigger.users_id",
+      :key="i",
+      v-model.number="trigger.users_id[i]",
+      placeholder="QQ号"
+    )
+    el-button(
+      size="mini",
+      icon="el-icon-circle-plus-outline",
+      @click="trigger.users_id.push(null)"
+    ) 添加
+    el-button(
+      size="mini",
+      icon="el-icon-remove-outline",
+      @click="trigger.users_id.pop()"
+    ) 删除
+  el-form-item(label="事件类型")
+    el-cascader(
+      :v-model="trigger.trigger_type",
+      :options="event_type_options",
+      :props="{ checkStrictly: true }"
+    )
+  el-form-item(label="回复")
+    el-input(
+      type="textarea",
+      :autosize="{ minRows: 4, maxRows: 20 }",
+      placeholder="请输入回复内容",
+      v-model="trigger.response"
+    )
+  el-form-item(label="优先级")
+    el-input-number(v-model="trigger.priority", size="small")
+  el-form-item(label="阻止后续")
+    el-checkbox(v-model="trigger.block") 匹配成功后，不再匹配后续规则
+  el-form-item
+    el-button(v-if="is_create", type="primary", @click="create") 创建
+    el-button(v-else, type="primary", @click="save") 保存
 </template>
 
 <script>

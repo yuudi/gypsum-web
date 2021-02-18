@@ -1,123 +1,79 @@
-<template>
-  <h3>编辑组</h3>
-  <div>
-    <el-form inline v-loading="loading">
-      <el-form-item>
-        <el-input v-model="group.display_name" :disabled="group_id === 0">
-        </el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="save" :disabled="group_id === 0">
-          保存
-        </el-button>
-      </el-form-item>
-    </el-form>
-  </div>
-  <div v-if="group.plugin_version !== 0">
-    <p>
-      导入的插件：{{ group.plugin_name }}
-      <span class="plugin_version_id">
-        version: {{ group.plugin_version }}
-      </span>
-    </p>
-  </div>
-  <br /><br />
-  <el-form inline>
-    <el-form-item>
-      <el-input v-model="export_info.plugin_name" :disabled="group_id === 0">
-      </el-input>
-    </el-form-item>
-    <el-form-item>
-      <el-button @click="export_group" :disabled="group_id === 0">
-        导出此组
-      </el-button>
-    </el-form-item>
-  </el-form>
-  <br /><br />
-  <div>
-    <el-space wrap>
-      新增项目
-      <el-button type="primary" @click="new_item('rule')"> 消息规则 </el-button>
-      <el-button type="primary" @click="new_item('trigger')">
-        事件规则
-      </el-button>
-      <el-button type="primary" @click="new_item('job')"> 定时任务 </el-button>
-      <el-button type="primary" @click="create_resource_dialog_visible = true">
-        静态文件
-      </el-button>
-      <el-dialog title="上传文件" v-model="create_resource_dialog_visible">
-        <el-upload
-          drag
-          multiple
-          ref="upload_resource_dialog"
-          :action="'/groups/' + group_id + '/resources/'"
-          :auto-upload="false"
-          :http-request="upload_resource_upload"
+<template lang="pug">
+h3 编辑组
+div
+  el-form(inline, v-loading="loading")
+    el-form-item
+      el-input(v-model="group.display_name", :disabled="group_id === 0")
+    el-form-item
+      el-button(type="primary", @click="save", :disabled="group_id === 0") 保存
+div(v-if="group.plugin_version !== 0")
+  p 导入的插件：{{ group.plugin_name }}
+    span.plugin_version_id version: {{ group.plugin_version }}
+br
+br
+el-form(inline)
+  el-form-item
+    el-input(v-model="export_info.plugin_name", :disabled="group_id === 0")
+  el-form-item
+    el-button(@click="export_group", :disabled="group_id === 0") 导出此组
+br
+br
+div
+  el-space(wrap) 新增项目
+    el-button(type="primary", @click="new_item('rule')") 消息规则
+    el-button(type="primary", @click="new_item('trigger')") 事件规则
+    el-button(type="primary", @click="new_item('job')") 定时任务
+    el-button(type="primary", @click="create_resource_dialog_visible = true") 静态文件
+    el-dialog(title="上传文件", v-model="create_resource_dialog_visible")
+      el-upload(
+        drag,
+        multiple,
+        ref="upload_resource_dialog",
+        :action="'/groups/' + group_id + '/resources/'",
+        :auto-upload="false",
+        :http-request="upload_resource_upload",
+        style="text-align: center"
+      )
+        i.el-icon-upload
+        div 将文件拖到此处，或
+          span(style="color: blue") 点击上传
+      template(#footer)
+        el-button(@click="create_resource_dialog_visible = false") 取消
+        el-button(type="primary", @click="upload_resource") 导入
+    el-button-group
+      el-button(
+        type="primary",
+        @click="create_group_dialog_visible = true",
+        :disabled="group_id !== 0"
+      ) 创建组
+      el-dialog(title="创建组", v-model="create_group_dialog_visible")
+        el-form
+          el-form-item(label="名称")
+            el-input(v-model="new_group.display_name") 
+        template(#footer)
+          el-button(@click="create_group_dialog_visible = false") 取消
+          el-button(type="primary", @click="create_group") 创建
+      el-button(
+        type="primary",
+        @click="import_group_dialog_visible = true",
+        :disabled="group_id !== 0"
+      ) 导入组
+      el-dialog(title="导入组", v-model="import_group_dialog_visible")
+        el-upload(
+          drag,
+          ref="import_group_dialog",
+          accept="application/zip",
+          :action="'/groups/' + group_id + '/groups'",
+          :auto-upload="false",
+          :http-request="import_group_upload",
           style="text-align: center"
-        >
-          <i class="el-icon-upload"></i>
-          <div>将文件拖到此处，或<span style="color: blue">点击上传</span></div>
-        </el-upload>
-        <template #footer>
-          <el-button @click="create_resource_dialog_visible = false">
-            取消
-          </el-button>
-          <el-button type="primary" @click="upload_resource"> 导入 </el-button>
-        </template>
-      </el-dialog>
-      <el-button-group>
-        <el-button
-          type="primary"
-          @click="create_group_dialog_visible = true"
-          :disabled="group_id !== 0"
-        >
-          创建组
-        </el-button>
-        <el-dialog title="创建组" v-model="create_group_dialog_visible">
-          <el-form>
-            <el-form-item label="名称">
-              <el-input v-model="new_group.display_name"> </el-input>
-            </el-form-item>
-          </el-form>
-          <template #footer>
-            <el-button @click="create_group_dialog_visible = false">
-              取消
-            </el-button>
-            <el-button type="primary" @click="create_group"> 创建 </el-button>
-          </template>
-        </el-dialog>
-        <el-button
-          type="primary"
-          @click="import_group_dialog_visible = true"
-          :disabled="group_id !== 0"
-        >
-          导入组
-        </el-button>
-        <el-dialog title="导入组" v-model="import_group_dialog_visible">
-          <el-upload
-            drag
-            ref="import_group_dialog"
-            accept="application/zip"
-            :action="'/groups/' + group_id + '/groups'"
-            :auto-upload="false"
-            :http-request="import_group_upload"
-            style="text-align: center"
-          >
-            <i class="el-icon-upload"></i>
-            <div>
-              将文件拖到此处，或<span style="color: blue">点击上传</span>
-            </div>
-          </el-upload>
-          <template #footer>
-            <el-button @click="import_group_dialog_visible = false">
-              取消
-            </el-button>
-            <el-button type="primary" @click="import_group"> 导入 </el-button>
-          </template>
-        </el-dialog>
-      </el-button-group></el-space
-    >
-  </div>
+        )
+          i.el-icon-upload
+          div 将文件拖到此处，或
+            span(style="color: blue") 点击上传
+        template(#footer)
+          el-button(@click="import_group_dialog_visible = false") 取消
+          el-button(type="primary", @click="import_group") 导入
 </template>
 
 <script>
@@ -243,6 +199,7 @@ export default {
           if (res.data.code == 0) {
             ElMessage.success("成功");
             thisvue.$emit("item-add", "group", res.data.group_id);
+            thisvue.create_group_dialog_visible = false;
           } else {
             thisvue.$alert("失败：" + res.data.message);
           }
