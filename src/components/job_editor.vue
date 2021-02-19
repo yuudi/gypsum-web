@@ -66,6 +66,25 @@ el-form(v-loading="loading", label-width="80px")
       placeholder="请输入执行或发送的内容",
       v-model="job.action"
     )
+    el-button(
+      type="text",
+      icon="el-icon-question",
+      @click="open_in_new_window('https://github.com/yuudi/gypsum/blob/master/docs/template.md')"
+    ) 简介
+    el-button(
+      type="text",
+      icon="el-icon-ship",
+      @click="debugger_dialog_visible = true"
+    ) 测试
+    el-dialog(title="模板测试", v-model="debugger_dialog_visible")
+      TemplateTester(
+        debug_type="message",
+        :matcher_type="rule.matcher_type",
+        :pattern="rule.patterns[0]",
+        :response="rule.response"
+      )
+      template(#footer)
+        el-button(@click="debugger_dialog_visible = false") 关闭
   el-form-item
     el-button(v-if="is_create", type="primary", @click="create") 创建
     el-button(v-else, type="primary", @click="save") 保存
@@ -76,8 +95,11 @@ import axios from "axios";
 import { ElMessage } from "element-plus";
 import cronstrue from "cronstrue/i18n";
 
+import TemplateTester from "./template_tester.vue";
+
 export default {
   name: "JobEditor",
+  components: { TemplateTester },
   props: {
     job_id: {
       type: Number,
@@ -95,6 +117,7 @@ export default {
   data() {
     return {
       loading: true,
+      debugger_dialog_visible: false,
       cron_advanced_editor: true,
       cron_time_simple: new Date(),
       job: {
@@ -138,6 +161,9 @@ export default {
         .catch(function (error) {
           thisvue.$alert("失败：" + error);
         });
+    },
+    open_in_new_window(url) {
+      window.open(url);
     },
     apply_time_pick_value() {
       let m = this.cron_time_simple.getMinutes();

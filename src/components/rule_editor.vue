@@ -91,12 +91,10 @@ el-form(:model="rule", v-loading="loading", label-width="80px")
       v-model="rule.response"
     )
     el-button(
-      v-for="data in template_help_infos",
-      :key="data.name",
       type="text",
       icon="el-icon-question",
-      @click="open_in_new_window(data.link)"
-    ) {{ data.name }}
+      @click="open_in_new_window('https://github.com/yuudi/gypsum/blob/master/docs/template.md')"
+    ) 简介
     el-button(
       type="text",
       icon="el-icon-ship",
@@ -185,24 +183,6 @@ export default {
         {
           value: 5,
           label: "正则匹配",
-        },
-      ],
-      template_help_infos: [
-        {
-          name: "简介",
-          link: "https://github.com/yuudi/gypsum/blob/v0.7.1/docs/template.md",
-        },
-        {
-          name: "函数",
-          link: "https://github.com/yuudi/gypsum/blob/v0.7.1/docs/functions.md",
-        },
-        {
-          name: "变量",
-          link: "https://github.com/yuudi/gypsum/blob/v0.7.1/docs/variables.md",
-        },
-        {
-          name: "lua",
-          link: "https://github.com/yuudi/gypsum/blob/v0.7.1/docs/lua.md",
         },
       ],
       rule: {

@@ -43,9 +43,10 @@ el-form(v-loading="loading", label-width="80px")
     ) 删除
   el-form-item(label="事件类型")
     el-cascader(
-      :v-model="trigger.trigger_type",
+      v-model="trigger.trigger_type",
       :options="event_type_options",
-      :props="{ checkStrictly: true }"
+      :props="{ checkStrictly: true }",
+      style="width: 240px"
     )
   el-form-item(label="回复")
     el-input(
@@ -54,6 +55,20 @@ el-form(v-loading="loading", label-width="80px")
       placeholder="请输入回复内容",
       v-model="trigger.response"
     )
+    el-button(
+      type="text",
+      icon="el-icon-question",
+      @click="open_in_new_window('https://github.com/yuudi/gypsum/blob/master/docs/template.md')"
+    ) 简介
+    el-button(
+      type="text",
+      icon="el-icon-ship",
+      @click="debugger_dialog_visible = true"
+    ) 测试
+    el-dialog(title="模板测试", v-model="debugger_dialog_visible")
+      TemplateTester(debug_type="notice", :matcher_type="trigger.matcher_type")
+      template(#footer)
+        el-button(@click="debugger_dialog_visible = false") 关闭
   el-form-item(label="优先级")
     el-input-number(v-model="trigger.priority", size="small")
   el-form-item(label="阻止后续")
@@ -67,8 +82,11 @@ el-form(v-loading="loading", label-width="80px")
 import axios from "axios";
 import { ElMessage } from "element-plus";
 
+import TemplateTester from "./template_tester.vue";
+
 export default {
   name: "TriggerEditor",
+  components: { TemplateTester },
   props: {
     trigger_id: {
       type: Number,
@@ -86,6 +104,7 @@ export default {
   data() {
     return {
       loading: true,
+      debugger_dialog_visible: false,
       event_type_options: [
         {
           value: "friend",
@@ -97,15 +116,15 @@ export default {
         },
         {
           value: "group",
-          label: "加群",
+          label: "加群请求",
           children: [
             {
               value: "add",
-              label: "加群请求",
+              label: "请求加入群",
             },
             {
               value: "invite",
-              label: "加群邀请",
+              label: "邀请加入群",
             },
           ],
         },
@@ -268,6 +287,9 @@ export default {
         .catch(function (error) {
           thisvue.$alert("失败：" + error);
         });
+    },
+    open_in_new_window(url) {
+      window.open(url);
     },
   },
   created() {

@@ -75,6 +75,7 @@ export default {
         .put("/gypsum/update", this.update)
         .then(function (res) {
           if (res.data.code === 0) {
+            thisvue.update_info.updating = true;
             ElMessage.success("已开始更新");
           } else {
             thisvue.$alert("失败：" + res.data.message);
@@ -85,16 +86,10 @@ export default {
         });
     },
     version_suggestions(_, cb) {
-      cb([
-        { value: "stable", lable: "稳定版" },
-        { value: "beta", lable: "预览版" },
-      ]);
+      cb([{ value: "stable" }, { value: "beta" }]);
     },
     mirror_suggestions(_, cb) {
-      cb([
-        { value: "github.com", lable: "稳定版" },
-        { value: "download.fastgit.org", lable: "预览版" },
-      ]);
+      cb([{ value: "github.com" }, { value: "download.fastgit.org" }]);
     },
   },
   created() {

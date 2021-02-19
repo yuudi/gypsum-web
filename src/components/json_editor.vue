@@ -7,8 +7,8 @@ el-form
       v-model="json_body"
     )
   el-form-item
-    el-button(@click="save_json_body") 保存
-    el-button(@click="load_json_body") 读取
+    el-button(@click="save_json_body") 存档
+    el-button(@click="load_json_body") 读档
     el-button(type="primary", @click="apply_json_body") 确定
 </template>
 
@@ -24,11 +24,16 @@ export default {
   emits: ["update:modelValue", "finish"],
   data() {
     return {
-      json_body: "",
+      json_body: JSON.stringify(this.modelValue, null, 4),
     };
   },
-  created() {
-    this.json_body = JSON.stringify(this.modelValue, null, 4);
+  watch: {
+    modelValue: {
+      handler(newValue) {
+        this.json_body = JSON.stringify(newValue, null, 4);
+      },
+      deep: true,
+    },
   },
   methods: {
     save_json_body() {
