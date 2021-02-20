@@ -1,22 +1,28 @@
 <template lang="pug">
 el-dialog(
+  title="登录",
   v-model="login_dialog_visible",
   :close-on-click-modal="false",
   :close-on-press-escape="false",
   :show-close="false"
 )
-  el-form
-    el-form-item(label="密码", placeholder="请输入密码", show-password)
+  el-form(@submit.native.prevent)
+    el-form-item(
+      label="密码",
+      placeholder="请输入密码",
+      show-password,
+      @keyup.enter="start_login"
+    )
       el-input(v-model="password_input")
-    el-form-item
-      el-button(
-        type="primary",
-        v-loading="login_loading",
-        :disabled="password_input === ''",
-        @click="start_login"
-      ) 登录
+  template(#footer)
+    el-button(
+      type="primary",
+      v-loading="login_loading",
+      :disabled="password_input === ''",
+      @click="start_login"
+    ) 登录 (Enter)
 el-container(style="height: 98vh")
-  el-aside(width="250px")
+  el-aside.left-aside
     p gypsum v{{ gypsum.version }}
     el-button(type="text", icon="el-icon-refresh", @click="refresh_key++") 刷新
     el-button(
@@ -230,6 +236,10 @@ export default {
         });
     },
     group_item_add(item_type, item_id) {
+      if (item_type == "job") {
+        // 这哪个家伙没有统一命名的……哦是我自己那没事了
+        item_type = "scheduler";
+      }
       let tree = this.$refs.group_tree;
       tree.append(
         {
@@ -275,10 +285,22 @@ export default {
 .item-tree-node-text {
   padding-top: 8px;
 }
+.left-aside {
+  width: 250px;
+  border-right-style: solid;
+  border-color: rgba(0, 0, 0, 0.1);
+  border-width: 1px;
+}
 </style>
 
 <style>
 .short-input {
   width: 180px;
+  margin-right: 10px;
+}
+
+.long-input {
+  width: 80vh;
+  margin-right: 10px;
 }
 </style>

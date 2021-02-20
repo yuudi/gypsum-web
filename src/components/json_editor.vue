@@ -1,15 +1,16 @@
 <template lang="pug">
-el-form
+el-form(@submit.native.prevent)
   el-form-item
     el-input(
       type="textarea",
       :autosize="{ minRows: 4, maxRows: 20 }",
-      v-model="json_body"
+      v-model="json_body",
+      @keyup.ctrl.enter="apply_json_body"
     )
   el-form-item
     el-button(@click="save_json_body") 存档
     el-button(@click="load_json_body") 读档
-    el-button(type="primary", @click="apply_json_body") 确定
+    el-button(type="primary", @click="apply_json_body") 确定 (Ctrl+Enter)
 </template>
 
 <script>

@@ -6,41 +6,41 @@ el-form(v-loading="loading", label-width="80px")
   el-form-item(label="状态")
     el-switch(v-model="job.active", active-text="启用", inactive-text="暂停")
   el-form-item(label="群号")
-    div(v-if="!job.groups_id.length") （不发送到群）
-    el-input(
-      v-for="(_, i) in job.groups_id",
-      :key="i",
-      v-model.number="job.groups_id[i]",
-      placeholder="群号"
-    )
+    div(v-if="!job.groups_id.length") （所有群）
+    div(v-for="(_, i) in job.groups_id")
+      el-input.short-input(
+        :key="i",
+        v-model.number="job.groups_id[i]",
+        placeholder="群号"
+      )
+      el-button(
+        size="mini",
+        icon="el-icon-remove-outline",
+        @click="job.groups_id.splice(i, 1)"
+      ) 删除
     el-button(
       size="mini",
       icon="el-icon-circle-plus-outline",
       @click="job.groups_id.push(null)"
     ) 添加
-    el-button(
-      size="mini",
-      icon="el-icon-remove-outline",
-      @click="job.groups_id.pop()"
-    ) 删除
   el-form-item(label="QQ号")
-    div(v-if="!job.users_id.length") （不发送到人）
-    el-input(
-      v-for="(_, i) in job.users_id",
-      :key="i",
-      v-model.number="job.users_id[i]",
-      placeholder="QQ号"
-    )
+    div(v-if="!job.users_id.length") （所有人）
+    div(v-for="(_, i) in job.users_id")
+      el-input.short-input(
+        :key="i",
+        v-model.number="job.users_id[i]",
+        placeholder="QQ号"
+      )
+      el-button(
+        size="mini",
+        icon="el-icon-remove-outline",
+        @click="job.users_id.splice(i, 1)"
+      ) 删除
     el-button(
       size="mini",
       icon="el-icon-circle-plus-outline",
       @click="job.users_id.push(null)"
     ) 添加
-    el-button(
-      size="mini",
-      icon="el-icon-remove-outline",
-      @click="job.users_id.pop()"
-    ) 删除
   el-form-item(label="单次任务")
     el-checkbox(v-model="job.once") 执行一次后自动删除此任务
   el-form-item(label="计划")
@@ -77,12 +77,7 @@ el-form(v-loading="loading", label-width="80px")
       @click="debugger_dialog_visible = true"
     ) 测试
     el-dialog(title="模板测试", v-model="debugger_dialog_visible")
-      TemplateTester(
-        debug_type="message",
-        :matcher_type="rule.matcher_type",
-        :pattern="rule.patterns[0]",
-        :response="rule.response"
-      )
+      TemplateTester(debug_type="schedule", :response="job.action")
       template(#footer)
         el-button(@click="debugger_dialog_visible = false") 关闭
   el-form-item

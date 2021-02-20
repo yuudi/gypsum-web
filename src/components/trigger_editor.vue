@@ -7,40 +7,40 @@ el-form(v-loading="loading", label-width="80px")
     el-switch(v-model="trigger.active", active-text="启用", inactive-text="暂停")
   el-form-item(label="群号")
     div(v-if="!trigger.groups_id.length") （所有群）
-    el-input(
-      v-for="(_, i) in trigger.groups_id",
-      :key="i",
-      v-model.number="trigger.groups_id[i]",
-      placeholder="群号"
-    )
+    div(v-for="(_, i) in trigger.groups_id")
+      el-input.short-input(
+        :key="i",
+        v-model.number="trigger.groups_id[i]",
+        placeholder="群号"
+      )
+      el-button(
+        size="mini",
+        icon="el-icon-remove-outline",
+        @click="trigger.groups_id.splice(i, 1)"
+      ) 删除
     el-button(
       size="mini",
       icon="el-icon-circle-plus-outline",
       @click="trigger.groups_id.push(null)"
     ) 添加
-    el-button(
-      size="mini",
-      icon="el-icon-remove-outline",
-      @click="trigger.groups_id.pop()"
-    ) 删除
   el-form-item(label="QQ号")
     div(v-if="!trigger.users_id.length") （所有人）
-    el-input(
-      v-for="(_, i) in trigger.users_id",
-      :key="i",
-      v-model.number="trigger.users_id[i]",
-      placeholder="QQ号"
-    )
+    div(v-for="(_, i) in trigger.users_id")
+      el-input.short-input(
+        :key="i",
+        v-model.number="trigger.users_id[i]",
+        placeholder="QQ号"
+      )
+      el-button(
+        size="mini",
+        icon="el-icon-remove-outline",
+        @click="trigger.users_id.splice(i, 1)"
+      ) 删除
     el-button(
       size="mini",
       icon="el-icon-circle-plus-outline",
       @click="trigger.users_id.push(null)"
     ) 添加
-    el-button(
-      size="mini",
-      icon="el-icon-remove-outline",
-      @click="trigger.users_id.pop()"
-    ) 删除
   el-form-item(label="事件类型")
     el-cascader(
       v-model="trigger.trigger_type",

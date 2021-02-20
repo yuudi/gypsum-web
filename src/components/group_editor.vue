@@ -1,7 +1,7 @@
 <template lang="pug">
 h3 编辑组
 div
-  el-form(inline, v-loading="loading")
+  el-form(inline, v-loading="loading", @submit.native.prevent)
     el-form-item
       el-input(v-model="group.display_name", :disabled="group_id === 0")
     el-form-item
@@ -11,7 +11,7 @@ div(v-if="group.plugin_version !== 0")
     span.plugin_version_id version: {{ group.plugin_version }}
 br
 br
-el-form(inline)
+el-form(inline, @submit.native.prevent)
   el-form-item
     el-input(v-model="export_info.plugin_name", :disabled="group_id === 0")
   el-form-item
@@ -38,7 +38,7 @@ div
         div 将文件拖到此处，或
           span(style="color: blue") 点击上传
       template(#footer)
-        el-button(@click="create_resource_dialog_visible = false") 取消
+        el-button(@click="create_resource_dialog_visible = false") 关闭
         el-button(type="primary", @click="upload_resource") 导入
     el-button-group
       el-button(
@@ -47,11 +47,14 @@ div
         :disabled="group_id !== 0"
       ) 创建组
       el-dialog(title="创建组", v-model="create_group_dialog_visible")
-        el-form
+        el-form(@submit.native.prevent)
           el-form-item(label="名称")
-            el-input(v-model="new_group.display_name") 
+            el-input(
+              v-model="new_group.display_name",
+              @keyup.enter="create_group"
+            ) 
         template(#footer)
-          el-button(@click="create_group_dialog_visible = false") 取消
+          el-button(@click="create_group_dialog_visible = false") 关闭
           el-button(type="primary", @click="create_group") 创建
       el-button(
         type="primary",
@@ -72,7 +75,7 @@ div
           div 将文件拖到此处，或
             span(style="color: blue") 点击上传
         template(#footer)
-          el-button(@click="import_group_dialog_visible = false") 取消
+          el-button(@click="import_group_dialog_visible = false") 关闭
           el-button(type="primary", @click="import_group") 导入
 </template>
 

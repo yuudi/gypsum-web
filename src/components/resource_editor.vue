@@ -21,6 +21,24 @@ div
     ) 浏览器无法在线播放此音频
   template(v-else) 无预览
 div
+  span.copy_bar_lable 资源编号：
+  el-input(
+    :value="resource_name",
+    ref="pongo_id",
+    readonly,
+    style="width: 400px"
+  )
+  el-button(icon="el-icon-copy-document", @click="copy_ref('pongo_id')") 复制
+div
+  span.copy_bar_lable 资源路径：
+  el-input(
+    :value="resource_path",
+    ref="pongo_path",
+    readonly,
+    style="width: 400px"
+  )
+  el-button(icon="el-icon-copy-document", @click="copy_ref('pongo_path')") 复制
+div
   span.copy_bar_lable 资源引用：
   el-input(
     :value="resource_ref",
@@ -60,6 +78,12 @@ export default {
   computed: {
     resource_ref() {
       return 'res("' + this.resource.sha256_sum + this.resource.ext + '")';
+    },
+    resource_path() {
+      return '"resources/' + this.resource.sha256_sum + this.resource.ext + '"';
+    },
+    resource_name() {
+      return this.resource.sha256_sum + this.resource.ext;
     },
   },
   methods: {

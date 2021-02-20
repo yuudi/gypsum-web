@@ -7,40 +7,40 @@ el-form(:model="rule", v-loading="loading", label-width="80px")
     el-switch(v-model="rule.active", active-text="启用", inactive-text="暂停")
   el-form-item(label="群号")
     div(v-if="!rule.groups_id.length") （所有群）
-    el-input(
-      v-for="(_, i) in rule.groups_id",
-      :key="i",
-      v-model.number="rule.groups_id[i]",
-      placeholder="群号"
-    )
+    div(v-for="(_, i) in rule.groups_id")
+      el-input.short-input(
+        :key="i",
+        v-model.number="rule.groups_id[i]",
+        placeholder="群号"
+      )
+      el-button(
+        size="mini",
+        icon="el-icon-remove-outline",
+        @click="rule.groups_id.splice(i, 1)"
+      ) 删除
     el-button(
       size="mini",
       icon="el-icon-circle-plus-outline",
       @click="rule.groups_id.push(null)"
     ) 添加
-    el-button(
-      size="mini",
-      icon="el-icon-remove-outline",
-      @click="rule.groups_id.pop()"
-    ) 删除
   el-form-item(label="QQ号")
     div(v-if="!rule.users_id.length") （所有人）
-    el-input(
-      v-for="(_, i) in rule.users_id",
-      :key="i",
-      v-model.number="rule.users_id[i]",
-      placeholder="QQ号"
-    )
+    div(v-for="(_, i) in rule.users_id")
+      el-input.short-input(
+        :key="i",
+        v-model.number="rule.users_id[i]",
+        placeholder="QQ号"
+      )
+      el-button(
+        size="mini",
+        icon="el-icon-remove-outline",
+        @click="rule.users_id.splice(i, 1)"
+      ) 删除
     el-button(
       size="mini",
       icon="el-icon-circle-plus-outline",
       @click="rule.users_id.push(null)"
     ) 添加
-    el-button(
-      size="mini",
-      icon="el-icon-remove-outline",
-      @click="rule.users_id.pop()"
-    ) 删除
   el-form-item(label="消息类型")
     el-select(v-model.number="rule.message_type", placeholder="请选择")
       el-option(
@@ -63,24 +63,24 @@ el-form(:model="rule", v-loading="loading", label-width="80px")
         :value="item.value"
       )
   el-form-item(label="匹配")
-    el-input(
-      v-for="(_, i) in rule.patterns",
-      :key="i",
-      v-model.number="rule.patterns[i]",
-      placeholder="匹配表达式"
-    )
+    div(v-for="(_, i) in rule.patterns")
+      el-input.long-input(
+        :key="i",
+        v-model.number="rule.patterns[i]",
+        placeholder="匹配表达式"
+      )
+      el-button(
+        size="mini",
+        icon="el-icon-remove-outline",
+        :disabled="rule.patterns.length <= 1",
+        @click="rule.patterns.splice(i, 1)"
+      ) 删除
     el-button(
       size="mini",
       icon="el-icon-circle-plus-outline",
       @click="rule.patterns.push(null)",
       :disabled="rule.matcher_type === 5 && rule.patterns.length >= 1"
     ) 添加
-    el-button(
-      size="mini",
-      icon="el-icon-remove-outline",
-      :disabled="rule.patterns.length <= 1",
-      @click="rule.patterns.pop()"
-    ) 删除
   el-form-item(label="仅被at")
     el-checkbox(v-model="rule.only_at_me") 仅当被at时触发
   el-form-item(label="回复")

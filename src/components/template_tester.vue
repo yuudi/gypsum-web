@@ -35,7 +35,10 @@ el-form
         el-form-item(label="接受消息群号")
           el-input(v-model.number="test_case.event.group_id")
         el-form-item(v-if="test_case.debug_type === 'message'", label="接受消息")
-          el-input(v-model="test_case.event.message")
+          el-input(
+            v-model="test_case.event.message",
+            @keyup.enter="event_editor_dialog_visible = false"
+          )
         el-form-item(v-if="test_case.debug_type === 'notice'", label="接受事件")
           el-cascader(
             v-model="event_type_select",
@@ -50,20 +53,25 @@ el-form
         @finish="json_editor_dialog_visible = false; save_test_event()"
       )
   el-form-item(v-if="test_case.debug_type === 'message'", label="匹配")
-    el-input(v-model.number="test_case.pattern", placeholder="匹配表达式")
+    el-input(
+      v-model.number="test_case.pattern",
+      placeholder="匹配表达式",
+      @keyup.ctrl.enter="execute_test"
+    )
   el-form-item(label="回复")
     el-input(
       type="textarea",
       :autosize="{ minRows: 4, maxRows: 20 }",
       placeholder="请输入回复内容",
-      v-model="test_case.response"
+      v-model="test_case.response",
+      @keyup.ctrl.enter="execute_test"
     )
   el-form-item
     el-button(
       type="primary",
       @click="execute_test",
       v-loading="test_result_dialog_loading"
-    ) 执行测试
+    ) 执行测试 (Ctrl+Enter)
     el-dialog(title="测试结果", v-model="test_result_dialog_visible")
       div {{ test_result.matched === null ? '' : test_result.matched ? '匹配成功' : '匹配失败' }}
       el-card
