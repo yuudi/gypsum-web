@@ -1,4 +1,20 @@
 <template lang="pug">
+el-dialog(
+  v-model="login_dialog_visible",
+  :close-on-click-modal="false",
+  :close-on-press-escape="false",
+  :show-close="false"
+)
+  el-form
+    el-form-item(label="密码", placeholder="请输入密码", show-password)
+      el-input(v-model="password_input")
+    el-form-item
+      el-button(
+        type="primary",
+        v-loading="login_loading",
+        :disabled="password_input === ''",
+        @click="start_login"
+      ) 登录
 el-container(style="height: 98vh")
   el-aside(width="250px")
     p gypsum v{{ gypsum.version }}
@@ -67,6 +83,7 @@ el-container(style="height: 98vh")
 </template>
 
 <script>
+import sha256 from "crypto-js/sha256";
 import axios from "axios";
 import { ElMessage } from "element-plus";
 
@@ -76,8 +93,6 @@ import ResourceEditor from "./components/resource_editor.vue";
 import RuleEditor from "./components/rule_editor.vue";
 import TriggerEditor from "./components/trigger_editor.vue";
 import Administrator from "./components/administrator.vue";
-
-axios.defaults.baseURL = "/api/v1";
 
 export default {
   name: "App",
@@ -94,8 +109,12 @@ export default {
       gypsum: {
         version: "unknown",
         commit: "unknown",
+        password_salt: "",
       },
+      password_input: "",
+      login_loading: false,
       admin_setting_dialog_visible: false,
+      login_dialog_visible: false,
       refresh_key: 0,
       item_icon: {
         group: "el-icon-folder-opened",
@@ -115,6 +134,29 @@ export default {
     };
   },
   methods: {
+    start_login() {
+      this.login_loading = true;
+      let password_hashed = String(
+        sha256(this.password_input + this.gypsum.password_salt)
+      );
+      let thisvue = this;
+      axios
+        .put("/gypsum/login", { password: password_hashed })
+        .then(function (res) {
+          if (res.data.code === 0) {
+            thisvue.login_dialog_visible = false;
+            thisvue.login_loading = false;
+            ElMessage.success("登录成功");
+          } else {
+            thisvue.login_loading = false;
+            thisvue.$alert("登录失败：" + res.data.message);
+          }
+        })
+        .catch(function (error) {
+          thisvue.login_loading = false;
+          thisvue.$alert("失败：" + error);
+        });
+    },
     load_group_items(node, resolve) {
       if (node.level === 0) {
         return resolve([
@@ -202,11 +244,15 @@ export default {
   created() {
     let thisvue = this;
     axios
-      .get("/gypsum/version")
+      .get("/gypsum/information")
       .then(function (res) {
         if (res.data.code === undefined) {
           thisvue.gypsum.version = res.data.version;
           thisvue.gypsum.commit = res.data.commit;
+          thisvue.gypsum.password_salt = res.data.password_salt;
+          if (res.data.logged_in === false) {
+            thisvue.login_dialog_visible = true;
+          }
         } else {
           thisvue.$alert("失败：" + res.data.message);
         }

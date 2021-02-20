@@ -11,10 +11,9 @@
     "axios": "^0.21.1",
     "core-js": "^3.8.3",
     "cronstrue": "^1.109.0",
+    "crypto-js": "^4.0.0",
     "element-plus": "^1.0.2-beta.32",
     "html-webpack-plugin": "^5.1.0",
-    "pug": "^3.0.0",
-    "pug-plain-loader": "^1.1.0",
     "vue": "^3.0.0"
   },
   "devDependencies": {
@@ -25,6 +24,8 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^7.19.0",
     "eslint-plugin-vue": "^7.6.0",
+    "pug": "^3.0.0",
+    "pug-plain-loader": "^1.1.0",
     "vue-cli-plugin-element-plus": "~0.0.13"
   },
   "eslintConfig": {
