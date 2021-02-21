@@ -2,6 +2,7 @@
 el-tree(
   :props="tree_props",
   :load="load_group_items",
+  :expand-on-click-node="false"
   draggable,
   :allow-drop="allow_drop",
   :allow-drag="allow_drag",
@@ -27,6 +28,7 @@ el-tree(
           style="cursor: grab"
         )
         el-button(
+          v-if="data.item_id !== 0",
           type="text",
           icon="el-icon-delete",
           @click="delete_item(node, data)"
@@ -144,7 +146,7 @@ export default {
           thisvue.$alert("失败：" + error);
         });
     },
-    group_item_add(item_type, item_id) {
+    group_item_add(item_type, item_id, display_name) {
       if (item_type == "job") {
         // 这哪个家伙没有统一命名的……哦是我自己那没事了
         item_type = "scheduler";
@@ -154,7 +156,7 @@ export default {
         {
           item_type: item_type,
           item_id: item_id,
-          display_name: "未命名",
+          display_name: display_name,
         },
         tree.getCurrentNode()
       );

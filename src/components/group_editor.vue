@@ -65,7 +65,7 @@ div
         el-upload(
           drag,
           ref="import_group_dialog",
-          accept="application/zip",
+          accept=".zip,.gypsum",
           :action="'/groups/' + group_id + '/groups'",
           :auto-upload="false",
           :http-request="import_group_upload",
@@ -184,7 +184,12 @@ export default {
         .then(function (res) {
           if (res.data.code === 0) {
             ElMessage.success("成功");
-            thisvue.$emit("item-add", "resource", res.data.resource_id);
+            thisvue.$emit(
+              "item-add",
+              "resource",
+              res.data.resource_id,
+              data.file.name
+            );
           } else {
             thisvue.$alert("失败：" + res.data.message);
           }
@@ -201,7 +206,12 @@ export default {
         .then(function (res) {
           if (res.data.code == 0) {
             ElMessage.success("成功");
-            thisvue.$emit("item-add", "group", res.data.group_id);
+            thisvue.$emit(
+              "item-add",
+              "group",
+              res.data.group_id,
+              thisvue.new_group.display_name
+            );
             thisvue.create_group_dialog_visible = false;
           } else {
             thisvue.$alert("失败：" + res.data.message);
@@ -232,7 +242,12 @@ export default {
         .then(function (res) {
           if (res.data.code === 0) {
             ElMessage.success("成功");
-            thisvue.$emit("item-add", "group", res.data.group_id);
+            thisvue.$emit(
+              "item-add",
+              "group",
+              res.data.group_id,
+              res.data.display_name
+            );
           } else {
             thisvue.$alert("失败：" + res.data.message);
           }
@@ -243,15 +258,18 @@ export default {
     },
     new_item(item_type) {
       let thisvue = this;
+      let new_item_data = this.defaults[item_type];
       axios
-        .post(
-          `/groups/${this.group_id}/${item_type}s`,
-          this.defaults[item_type]
-        )
+        .post(`/groups/${this.group_id}/${item_type}s`, new_item_data)
         .then(function (res) {
           if (res.data.code == 0) {
             ElMessage.success("成功");
-            thisvue.$emit("item-add", item_type, res.data[item_type + "_id"]);
+            thisvue.$emit(
+              "item-add",
+              item_type,
+              res.data[item_type + "_id"],
+              new_item_data.display_name
+            );
           } else {
             thisvue.$alert("失败：" + res.data.message);
           }

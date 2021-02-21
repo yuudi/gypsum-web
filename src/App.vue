@@ -71,7 +71,7 @@ import JobEditor from "./components/job_editor.vue";
 import ResourceEditor from "./components/resource_editor.vue";
 import RuleEditor from "./components/rule_editor.vue";
 import TriggerEditor from "./components/trigger_editor.vue";
-import ItemTree from "./components/items-tree.vue";
+import ItemTree from "./components/items_tree.vue";
 import Administrator from "./components/administrator.vue";
 
 export default {
