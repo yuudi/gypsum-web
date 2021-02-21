@@ -211,7 +211,7 @@ export default {
           thisvue.$alert("失败：" + error);
         })
         .finally(function () {
-          this.create_group_dialog_visible = false;
+          thisvue.create_group_dialog_visible = false;
         });
     },
     import_group() {
