@@ -2,10 +2,12 @@
 el-tree(
   :props="tree_props",
   :load="load_group_items",
-  :expand-on-click-node="false"
+  :expand-on-click-node="false",
+  :highlight-current="true",
   draggable,
   :allow-drop="allow_drop",
   :allow-drag="allow_drag",
+  @node-click="group_item_selected",
   @node-drag-start="dragging = true",
   @node-drag-end="dragging = false",
   @node-drop="handle_drop",
@@ -13,26 +15,31 @@ el-tree(
   ref="group_tree"
 )
   template(#default="{ node, data }")
-    span.item-tree-node(
-      style="cursor: auto",
-      :class="[{ dragging: dragging }, node_class(data)]"
-    )
-      span.item-tree-node-text(
-        @click="group_item_selected(data)",
-        style="cursor: pointer"
-      )
+    span.item-tree-node(:class="[{ dragging: dragging }, node_class(data)]")
+      span.item-tree-node-text
         i(:class="item_icon[data.item_type]") {{ data.display_name }}
       span
         i.el-icon-d-caret(
           v-if="data.item_type !== 'group'",
-          style="cursor: grab"
+          style="cursor: grab",
+          @click.stop
         )
         el-button(
           v-if="data.item_id !== 0",
           type="text",
           icon="el-icon-delete",
-          @click="delete_item(node, data)"
+          @click.stop="delete_item(node, data)"
         )
+        el-dialog(title="确认删除", v-model="confirm_deletion_dialog_visible")
+          div(style="padding-bottom: 20px")
+            i.el-icon-warning(style="color: #e6a23c; font-size: 24px")
+            template(v-if="deleting_group") 组内的项目会被移动到 root group，
+            | 此操作无法撤销
+          el-checkbox(v-model="do_not_confirm_deletion") 
+            div(style="opacity: 0.7; font-size: 12px") 本次运行不再提醒
+          template(#footer)
+            el-button(@click="confirm_deletion_dialog_visible = false") 取消
+            el-button(type="danger", @click="delete_item_confirm(node, data)") 确认
 </template>
 
 <script>
@@ -48,6 +55,9 @@ export default {
   data() {
     return {
       dragging: false,
+      confirm_deletion_dialog_visible: false,
+      deleting_group: false, //单独作为变量，否则用 data.item_type 会有抖动
+      do_not_confirm_deletion: false,
       tree_props: {
         label: "display_name",
         children: "items",
@@ -127,7 +137,14 @@ export default {
         });
     },
     delete_item(node, data) {
-      this.$refs.group_tree.remove(node);
+      if (this.do_not_confirm_deletion) {
+        this.delete_item_confirm(node, data);
+      } else {
+        this.deleting_group = data.item_type === "group";
+        this.confirm_deletion_dialog_visible = true;
+      }
+    },
+    delete_item_confirm(node, data) {
       let config = {};
       if (data.item_type === "group") {
         config.data = { move_to: 0 };
@@ -138,6 +155,8 @@ export default {
         .then(function (res) {
           if (res.data.code == 0) {
             ElMessage.success("已删除");
+            thisvue.$refs.group_tree.remove(node);
+            thisvue.confirm_deletion_dialog_visible = false;
           } else {
             thisvue.$alert("失败：" + res.data.message);
           }
