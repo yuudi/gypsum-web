@@ -64,6 +64,7 @@ div
       el-dialog(title="导入组", v-model="import_group_dialog_visible")
         el-upload(
           drag,
+          multiple,
           ref="import_group_dialog",
           accept=".zip,.gypsum",
           :action="'/groups/' + group_id + '/groups'",
@@ -228,8 +229,10 @@ export default {
       this.$refs.import_group_dialog.submit();
     },
     import_group_upload(data) {
-      if (!data.file.name.endsWith(".zip")) {
-        alert("只能导入zip文件");
+      if (
+        !(data.file.name.endsWith(".zip") || data.file.name.endsWith(".gypsum"))
+      ) {
+        alert("只能导入 .gypsum 文件");
         return;
       }
       let thisvue = this;
