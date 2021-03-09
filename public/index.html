@@ -7,22 +7,23 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <link rel="icon" href="/assets/favicon.ico">
   <title>gypsum panel</title>
+  <% var pkg = require('../package.json'); var ver = pkg.dependencies; %>
   <%if (process.env.NODE_ENV==='development' ) { %>
-    <script src="https://cdn.jsdelivr.net/npm/core-js-bundle@3.9.1/index.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@3.0.7/dist/vue.global.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios@0.21.1/dist/axios.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.0.0/crypto-js.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/element-plus@1.0.2-beta.33/lib/index.full.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/cronstrue@1.109.0/dist/cronstrue-i18n.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-plus@1.0.2-beta.33/lib/theme-chalk/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/core-js-bundle@<%= ver['core-js'] %>/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@<%= ver.vue %>/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@<%= ver.axios %>/dist/axios.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/crypto-js@<%= ver['crypto-js'] %>/crypto-js.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/element-plus@<%= ver['element-plus'] %>/lib/index.full.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cronstrue@<%= ver.cronstrue %>/dist/cronstrue-i18n.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-plus@<%= ver['element-plus'] %>/lib/theme-chalk/index.css">
   <% } else { %>
-    <script src="https://cdn.jsdelivr.net/npm/core-js-bundle@3.9.1/minified.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@3.0.7/dist/vue.runtime.global.prod.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios@0.21.1/dist/axios.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.0.0/crypto-js.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/element-plus@1.0.2-beta.33/lib/index.full.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/cronstrue@1.109.0/dist/cronstrue-i18n.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-plus@1.0.2-beta.33/lib/theme-chalk/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/core-js-bundle@<%= ver['core-js'] %>/minified.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@<%= ver.vue %>/dist/vue.runtime.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@<%= ver.axios %>/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/crypto-js@<%= ver['crypto-js'] %>/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/element-plus@<%= ver['element-plus'] %>/lib/index.full.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cronstrue@<%= ver.cronstrue %>/dist/cronstrue-i18n.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-plus@<%= ver['element-plus'] %>/lib/theme-chalk/index.css">
   <% } %>
 </head>
 
