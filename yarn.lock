@@ -2892,10 +2892,10 @@ create-hmac@^1.1.0, create-hmac@^1.1.4, create-hmac@^1.1.7:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
-cronstrue@1.110.0:
-  version "1.110.0"
-  resolved "https://registry.npm.taobao.org/cronstrue/download/cronstrue-1.110.0.tgz#cffbef09855141e518341ed5a4b575a5a4811638"
-  integrity sha1-z/vvCYVRQeUYNB7VpLV1paSBFjg=
+cronstrue@1.111.0:
+  version "1.111.0"
+  resolved "https://registry.yarnpkg.com/cronstrue/-/cronstrue-1.111.0.tgz#689b358c9ac6ae6b6352043339c3207122b2e602"
+  integrity sha512-XuZj3jHp3p3r6OXo8yuhjO0n6UEj9qEtpSzVg9ruKhpV5pBJZCqZwpaApqRV0nW+AJLiAB+3OSPEWcFlzIM25g==
 
 cross-spawn@^5.0.1:
   version "5.1.0"
