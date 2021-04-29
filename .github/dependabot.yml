@@ -1,0 +1,21 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: monthly
+    time: "21:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: "@vue/cli-plugin-babel"
+    versions:
+    - 4.5.12
+  - dependency-name: "@vue/compiler-sfc"
+    versions:
+    - 3.0.10
+  - dependency-name: vue
+    versions:
+    - 3.0.10
+  - dependency-name: eslint
+    versions:
+    - 7.23.0
