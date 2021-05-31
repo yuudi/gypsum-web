@@ -21,7 +21,7 @@ div
     ) 浏览器无法在线播放此音频
   template(v-else) 无预览
 div
-  span.copy_bar_lable 资源编号：
+  span.copy_bar_label 资源编号：
   el-input(
     :value="resource_name",
     ref="pongo_id",
@@ -30,7 +30,7 @@ div
   )
   el-button(icon="el-icon-copy-document", @click="copy_ref('pongo_id')") 复制
 div
-  span.copy_bar_lable 资源路径：
+  span.copy_bar_label 资源路径：
   el-input(
     :value="resource_path",
     ref="pongo_path",
@@ -39,7 +39,7 @@ div
   )
   el-button(icon="el-icon-copy-document", @click="copy_ref('pongo_path')") 复制
 div
-  span.copy_bar_lable 资源引用：
+  span.copy_bar_label 资源引用：
   el-input(
     :value="resource_ref",
     ref="pongo_ref",
@@ -133,7 +133,7 @@ export default {
 </script>
 
 <style scoped>
-.copy_bar_lable {
+.copy_bar_label {
   width: 90px;
   display: inline-block;
 }
