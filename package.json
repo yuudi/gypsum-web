@@ -12,7 +12,7 @@
     "core-js": "3.13.1",
     "cronstrue": "1.113.0",
     "crypto-js": "4.0.0",
-    "element-plus": "1.0.2-beta.45",
+    "element-plus": "1.0.2-beta.46",
     "html-webpack-plugin": "5.3.1",
     "vue": "3.0.11"
   },
